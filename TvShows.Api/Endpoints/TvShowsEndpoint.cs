@@ -1,4 +1,4 @@
-namespace TvShows.Api;
+namespace TvShows.Api.Endpoints;
 
 internal static class TvShowsEndpoint
 {

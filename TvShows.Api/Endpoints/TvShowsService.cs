@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TvShows.Database;
 using Db = TvShows.Database.Models;
 
-namespace TvShows.Api;
+namespace TvShows.Api.Endpoints;
 
 internal class TvShowsService(TvShowsDbContext db)
 {

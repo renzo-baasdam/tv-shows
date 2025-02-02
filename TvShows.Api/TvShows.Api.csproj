@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <RootNamespace>TvShows</RootNamespace>
+    <RootNamespace>TvShows.Api</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TvShows.Api;
+using TvShows.Api.Endpoints;
 using TvShows.Database;
 
 var builder = WebApplication.CreateBuilder(args);
