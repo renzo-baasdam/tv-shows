@@ -11,8 +11,8 @@ namespace TvShows.Scraper;
 
 public class TvMazeScraper(
     HttpClient client,
-    IOptions<TvMazeScraperOptions> options,
-    IServiceScopeFactory scopeFactory) : BackgroundService
+    IServiceScopeFactory scopeFactory,
+    IOptions<TvMazeScraperOptions> options) : BackgroundService
 {
     private const int ShowsPageSize = 250;
     private const int PeoplePageSize = 1000;
@@ -169,7 +169,7 @@ public class TvMazeScraper(
         {
             Id = person.Id,
             Name = person.Name,
-            BirthDay = person.BirthDay,
+            Birthday = person.BirthDay,
             TvShows = [],
         };
 }

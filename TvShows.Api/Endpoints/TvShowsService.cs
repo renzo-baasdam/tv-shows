@@ -13,7 +13,7 @@ internal class TvShowsService(TvShowsDbContext db)
         var pageStart = page * PageSize;
         var pageEnd = (page + 1) * PageSize; // Non-inclusive
         var dbModels = await db.TvShows
-            .Include(show => show.Cast.OrderByDescending(person => person.BirthDay ?? DateOnly.MinValue))
+            .Include(show => show.Cast.OrderByDescending(person => person.Birthday ?? DateOnly.MinValue))
             .Where(show => show.Id >= pageStart && show.Id < pageEnd)
             .Take(PageSize)
             .OrderBy(show => show.Id)
@@ -36,6 +36,6 @@ internal class TvShowsService(TvShowsDbContext db)
         {
             Id = person.Id,
             Name = person.Name,
-            BirthDay = person.BirthDay
+            Birthday = person.Birthday
         };
 }
