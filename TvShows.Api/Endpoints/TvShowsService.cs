@@ -15,11 +15,10 @@ internal class TvShowsService(TvShowsDbContext db)
         var dbModels = await db.TvShows
             .Include(show => show.Cast.OrderByDescending(person => person.Birthday ?? DateOnly.MinValue))
             .Where(show => show.Id >= pageStart && show.Id < pageEnd)
-            .Take(PageSize)
             .OrderBy(show => show.Id)
             .ToListAsync();
         return dbModels.Count > 0
-            ? dbModels.Select(MapToResponseModel).ToArray() 
+            ? dbModels.Select(MapToResponseModel).ToArray()
             : [];
     }
     

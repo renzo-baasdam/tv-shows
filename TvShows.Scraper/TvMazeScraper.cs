@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Net;
@@ -12,7 +13,9 @@ namespace TvShows.Scraper;
 public class TvMazeScraper(
     HttpClient client,
     IServiceScopeFactory scopeFactory,
-    IOptions<TvMazeScraperOptions> options) : BackgroundService
+    IHostApplicationLifetime lifetime,
+    IOptions<TvMazeScraperOptions> options,
+    ILogger<TvMazeScraper> logger) : BackgroundService
 {
     private const int ShowsPageSize = 250;
     private const int PeoplePageSize = 1000;
@@ -35,17 +38,20 @@ public class TvMazeScraper(
         var showsUpToDate = false;
         var peopleUpToDate = false;
         var castUpToDate = false;
+        logger.LogInformation("Starting www.tvmaze.com scraper...");
         // Prioritize getting all tv show data -> then people data -> then link the cast
         while (true)
         {
-            if (!showsUpToDate) showsUpToDate = await GetTvShows(stoppingToken, dbContext);
-            else if (!peopleUpToDate) peopleUpToDate = await GetPeople(stoppingToken, dbContext);
-            else if (!castUpToDate) castUpToDate = await GetCast(stoppingToken, dbContext);
-            else return;
+            if (!showsUpToDate) showsUpToDate = await GetTvShows(dbContext, stoppingToken);
+            else if (!peopleUpToDate) peopleUpToDate = await GetPeople(dbContext, stoppingToken);
+            else if (!castUpToDate) castUpToDate = await GetCast(dbContext, stoppingToken);
+            else break;
         }
+        logger.LogInformation("Finished www.tvmaze.com scraping.");
+        lifetime.StopApplication();
     }
     
-    private async Task<bool> GetTvShows(CancellationToken ct, TvShowsDbContext dbContext)
+    private async Task<bool> GetTvShows(TvShowsDbContext dbContext, CancellationToken ct)
     {
         var page = dbContext.TvShows.Any()
             ? dbContext.TvShows.Max(p => p.Id) / ShowsPageSize + 1
@@ -61,7 +67,7 @@ public class TvMazeScraper(
         return false;
     }
     
-    private async Task<bool> GetPeople(CancellationToken ct, TvShowsDbContext dbContext)
+    private async Task<bool> GetPeople(TvShowsDbContext dbContext, CancellationToken ct)
     {
         var page = dbContext.People.Any()
             ? dbContext.People.Max(p => p.Id) / PeoplePageSize + 1
@@ -77,7 +83,7 @@ public class TvMazeScraper(
         return false;
     }
     
-    private async Task<bool> GetCast(CancellationToken ct, TvShowsDbContext dbContext)
+    private async Task<bool> GetCast(TvShowsDbContext dbContext, CancellationToken ct)
     {
         var show = dbContext.TvShows.FirstOrDefault(show => !show.CastAdded);
         if (show is null) return true;
